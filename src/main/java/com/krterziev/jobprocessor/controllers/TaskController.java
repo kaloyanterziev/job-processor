@@ -6,8 +6,15 @@ import com.krterziev.jobprocessor.models.Task;
 import com.krterziev.jobprocessor.payload.request.TasksRequest;
 import com.krterziev.jobprocessor.payload.response.TaskResponse;
 import com.krterziev.jobprocessor.services.TaskService;
+import com.krterziev.jobprocessor.transformers.BashScriptTransformer;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -26,9 +33,25 @@ public class TaskController {
     this.taskService = taskService;
   }
 
-  @GetMapping("/sort")
-  public List<TaskResponse> sortTasks(@RequestBody final TasksRequest tasksRequest) {
+  @GetMapping("/sort-to-json")
+  public ResponseEntity<List<TaskResponse>> sortTasks(
+      @RequestBody final TasksRequest tasksRequest) {
     final List<Task> tasks = taskService.sortTasks(transform(tasksRequest));
-    return transform(tasks);
+    return ResponseEntity.ok(transform(tasks));
+  }
+
+  @GetMapping(
+      value = "/sort-to-bash",
+      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  public ResponseEntity<Resource> sortTasksAndReturnBashScript(
+      @RequestBody final TasksRequest tasksRequest)
+      throws IOException {
+    final List<Task> tasks = taskService.sortTasks(transform(tasksRequest));
+    final InputStream inputStream = BashScriptTransformer.transform(tasks);
+    final InputStreamResource resource = new InputStreamResource(inputStream);
+    return ResponseEntity.ok()
+        .contentLength(inputStream.available())
+        .contentType(MediaType.APPLICATION_OCTET_STREAM)
+        .body(resource);
   }
 }
