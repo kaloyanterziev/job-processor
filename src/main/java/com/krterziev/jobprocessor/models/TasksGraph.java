@@ -1,5 +1,6 @@
 package com.krterziev.jobprocessor.models;
 
+import com.krterziev.jobprocessor.exceptions.CircularDependencyDetectedException;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,7 @@ public class TasksGraph {
     }
   }
 
-  public List<Task> sort() {
+  public List<Task> sort() throws CircularDependencyDetectedException {
     final List<Task> result = new ArrayList<>();
     final Queue<Task> taskQueue = new ArrayDeque<>();
     for (final Task task : tasks) {
@@ -49,7 +50,7 @@ public class TasksGraph {
       }
     }
     if (result.size() != tasks.size()) {
-      return new ArrayList<>();
+      throw new CircularDependencyDetectedException();
     }
     return result;
   }

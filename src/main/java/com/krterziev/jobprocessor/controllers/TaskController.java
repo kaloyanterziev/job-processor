@@ -2,6 +2,7 @@ package com.krterziev.jobprocessor.controllers;
 
 import static com.krterziev.jobprocessor.transformers.TaskTransformer.transform;
 
+import com.krterziev.jobprocessor.exceptions.CircularDependencyDetectedException;
 import com.krterziev.jobprocessor.models.Task;
 import com.krterziev.jobprocessor.payload.request.TasksRequest;
 import com.krterziev.jobprocessor.payload.response.TaskResponse;
@@ -36,7 +37,7 @@ public class TaskController {
 
   @GetMapping("/sort")
   public ResponseEntity<List<TaskResponse>> sortTasks(
-      @RequestBody final TasksRequest tasksRequest) {
+      @RequestBody final TasksRequest tasksRequest) throws CircularDependencyDetectedException {
     final List<Task> tasks = taskService.sortTasks(transform(tasksRequest));
     return ResponseEntity.ok(transform(tasks));
   }
@@ -45,7 +46,7 @@ public class TaskController {
       value = "/sort")
   public ResponseEntity<Resource> sortTasksAndReturnBashScript(
       @RequestBody final TasksRequest tasksRequest)
-      throws IOException {
+      throws IOException, CircularDependencyDetectedException {
     final List<Task> tasks = taskService.sortTasks(transform(tasksRequest));
     final InputStream inputStream = BashScriptTransformer.transform(tasks);
     final InputStreamResource resource = new InputStreamResource(inputStream);
