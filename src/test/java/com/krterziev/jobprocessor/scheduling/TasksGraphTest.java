@@ -126,5 +126,29 @@ public class TasksGraphTest {
     assertThat(graph.sort(), equalTo(expectedTasks));
   }
 
+  @Test
+  void givenMultipleUnsortedTasksWithTwoTasksWithTheSamePrerequisites_thenSortInOrder()
+      throws CircularDependencyDetectedException {
+    final Set<String> taskTwoPrerequisites = new HashSet<>(Arrays.asList(TASK_1_NAME));
+    final Set<String> taskThreePrerequisites = new HashSet<>(Arrays.asList(TASK_1_NAME));
+    final Set<String> taskFourPrerequisites = new HashSet<>(Arrays.asList(TASK_2_NAME, TASK_3_NAME));
+
+    final List<Task> tasks = Arrays.asList(
+        new Task(TASK_1_NAME, TASK_COMMAND, Collections.emptySet()),
+        new Task(TASK_2_NAME, TASK_COMMAND, taskTwoPrerequisites),
+        new Task(TASK_3_NAME, TASK_COMMAND, taskThreePrerequisites),
+        new Task(TASK_4_NAME, TASK_COMMAND, taskFourPrerequisites));
+
+    final TasksGraph graph = new TasksGraph(tasks);
+
+    final List<Task> expectedTasks = Arrays.asList(
+        new Task(TASK_1_NAME, TASK_COMMAND, Collections.emptySet()),
+        new Task(TASK_2_NAME, TASK_COMMAND, Collections.emptySet()),
+        new Task(TASK_3_NAME, TASK_COMMAND, Collections.emptySet()),
+        new Task(TASK_4_NAME, TASK_COMMAND, Collections.emptySet()));
+
+    assertThat(graph.sort(), equalTo(expectedTasks));
+  }
+
 
 }
