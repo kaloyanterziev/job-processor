@@ -14,7 +14,7 @@ public class BashScriptTransformer {
   }
 
   public static InputStream transform(List<Task> tasks) {
-    final StringBuilder stringBuilder = new StringBuilder(BASH_COMMENT).append("\n");
+    final StringBuilder stringBuilder = new StringBuilder(BASH_COMMENT).append("\n\n");
     for (final Task task : tasks) {
       stringBuilder.append(task.command()).append("\n");
     }

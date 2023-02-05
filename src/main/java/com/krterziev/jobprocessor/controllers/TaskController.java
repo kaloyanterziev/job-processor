@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,16 +34,15 @@ public class TaskController {
     this.taskService = taskService;
   }
 
-  @GetMapping("/sort-to-json")
+  @GetMapping("/sort")
   public ResponseEntity<List<TaskResponse>> sortTasks(
       @RequestBody final TasksRequest tasksRequest) {
     final List<Task> tasks = taskService.sortTasks(transform(tasksRequest));
     return ResponseEntity.ok(transform(tasks));
   }
 
-  @GetMapping(
-      value = "/sort-to-bash",
-      produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+  @PostMapping(
+      value = "/sort")
   public ResponseEntity<Resource> sortTasksAndReturnBashScript(
       @RequestBody final TasksRequest tasksRequest)
       throws IOException {
