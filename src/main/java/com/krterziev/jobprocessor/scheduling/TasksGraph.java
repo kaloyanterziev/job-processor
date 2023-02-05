@@ -1,6 +1,7 @@
-package com.krterziev.jobprocessor.models;
+package com.krterziev.jobprocessor.scheduling;
 
 import com.krterziev.jobprocessor.exceptions.CircularDependencyDetectedException;
+import com.krterziev.jobprocessor.models.Task;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
