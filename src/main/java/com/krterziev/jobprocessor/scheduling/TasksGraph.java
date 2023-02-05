@@ -9,8 +9,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class TasksGraph {
 
@@ -19,12 +17,9 @@ public class TasksGraph {
 
   public TasksGraph(List<Task> tasks) {
     this.tasks = tasks;
-//    final Map<String, Task> nameToTask = tasks.stream()
-//        .collect(Collectors.toMap(Task::name, Function.identity()));
 
     for (final Task task : tasks) {
       for (String prerequisiteTaskName : task.requires()) {
-//        final Task prerequisiteTask = nameToTask.get(prerequisiteTaskName);
         adjacencyList.putIfAbsent(prerequisiteTaskName, new ArrayList<>());
         adjacencyList.get(prerequisiteTaskName).add(task);
       }
