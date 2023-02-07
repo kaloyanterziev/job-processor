@@ -19,7 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,7 +37,7 @@ public class TaskController {
     this.taskService = taskService;
   }
 
-  @GetMapping("/sort")
+  @PostMapping("/sort")
   public ResponseEntity<List<TaskResponse>> sortTasks(
       @RequestBody @TaskPrerequisitesConstraint final TasksRequest tasksRequest)
       throws CircularDependencyDetectedException {
@@ -47,7 +46,7 @@ public class TaskController {
   }
 
   @PostMapping(
-      value = "/sort")
+      value = "/sort-commands")
   public ResponseEntity<Resource> sortTasksAndReturnBashScript(
       @RequestBody @TaskPrerequisitesConstraint final TasksRequest tasksRequest)
       throws IOException, CircularDependencyDetectedException {

@@ -5,7 +5,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -59,7 +58,7 @@ public class TaskControllerTest {
     when(service.sortTasks(unsortedTasks)).thenReturn(tasks);
 
     final List<TaskResponse> expectedTasksResponse = givenTasksResponse();
-    mvc.perform(get("/tasks/sort")
+    mvc.perform(post("/tasks/sort")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isOk())
@@ -79,7 +78,7 @@ public class TaskControllerTest {
     when(service.sortTasks(unsortedTasks)).thenReturn(tasks);
 
     final String expectedTasksResponse = givenTasksResponseAsBashScript();
-    mvc.perform(post("/tasks/sort")
+    mvc.perform(post("/tasks/sort-commands")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isOk())
@@ -96,7 +95,7 @@ public class TaskControllerTest {
     final List<Task> unsortedTasks = givenUnsortedTasksWithCircularDependency();
     when(service.sortTasks(unsortedTasks)).thenThrow(new CircularDependencyDetectedException());
 
-    mvc.perform(get("/tasks/sort")
+    mvc.perform(post("/tasks/sort")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
@@ -112,7 +111,7 @@ public class TaskControllerTest {
     final List<Task> unsortedTasks = givenUnsortedTasksWithCircularDependency();
     when(service.sortTasks(unsortedTasks)).thenThrow(new CircularDependencyDetectedException());
 
-    mvc.perform(post("/tasks/sort")
+    mvc.perform(post("/tasks/sort-commands")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
@@ -125,7 +124,7 @@ public class TaskControllerTest {
       throws Exception {
     final TasksRequest tasksRequest = givenTasksRequestWithInvalidPrerequisites();
 
-    mvc.perform(get("/tasks/sort")
+    mvc.perform(post("/tasks/sort")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
@@ -138,7 +137,7 @@ public class TaskControllerTest {
       throws Exception {
     final TasksRequest tasksRequest = givenTasksRequestWithInvalidPrerequisites();
 
-    mvc.perform(post("/tasks/sort")
+    mvc.perform(post("/tasks/sort-commands")
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
@@ -148,7 +147,8 @@ public class TaskControllerTest {
 
   private TasksRequest givenTasksRequestWithInvalidPrerequisites() {
     return new TasksRequest(Arrays.asList(
-        new TaskRequest(TASK_2_NAME, TASK_2_COMMAND, Collections.singletonList("invalid-task-name")),
+        new TaskRequest(TASK_2_NAME, TASK_2_COMMAND,
+            Collections.singletonList("invalid-task-name")),
         new TaskRequest(TASK_1_NAME, TASK_1_COMMAND, Collections.singletonList(TASK_2_NAME)),
         new TaskRequest(TASK_3_NAME, TASK_3_COMMAND, Collections.emptyList())));
   }
