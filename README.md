@@ -34,8 +34,8 @@ After a remote debugger is attached to the application using the aforementioned 
 ## API Endpoints
 | HTTP Verbs | Endpoints | Action |
 | -- | --- | --- |
-| GET | /tasks/sort | Sort the tasks and return the result in JSON |
-| POST | /tasks/sort | Sort the tasks and return the result as a stream of bytes in the form of bash script |
+| POST | /tasks/sort | Sort the tasks and return the result in JSON |
+| POST | /tasks/sort-commands | Sort the tasks and return the commands as a stream of bytes in the form of a bash script |
 
 
 ## License
