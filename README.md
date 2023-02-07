@@ -21,7 +21,13 @@ It can be run from the project's base directory like so:
 ```shell
 ./gradlew bootRun  
 ```
-After running it, the application should be running on port 8080.
+After running it, the application should be running on port 8080. 
+
+To test the application, you can run the following command from the shell:
+
+```shell
+curl -d @mytasks.json http://localhost:8080/tasks/sort-commands -H "Content-Type: application/json" | bash
+```
 
 The application can also be run in debug mode which exposes port 5005 for debugging like so:
 
