@@ -22,6 +22,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -87,15 +89,16 @@ public class TaskControllerTest {
     verify(service, times(1)).sortTasks(unsortedTasks);
   }
 
-  @Test
-  void givenTasksWithCircularDependency_whenSorting_thenReturnBadRequest()
+  @ParameterizedTest
+  @ValueSource(strings = {"/tasks/sort", "/tasks/sort-commands"})
+  void givenTasksWithCircularDependency_whenSorting_thenReturnBadRequest(final String route)
       throws Exception {
     final TasksRequest tasksRequest = givenTasksRequestWithCircularDependency();
 
     final List<Task> unsortedTasks = givenUnsortedTasksWithCircularDependency();
     when(service.sortTasks(unsortedTasks)).thenThrow(new CircularDependencyDetectedException());
 
-    mvc.perform(post("/tasks/sort")
+    mvc.perform(post(route)
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
@@ -103,41 +106,13 @@ public class TaskControllerTest {
     verify(service, times(1)).sortTasks(unsortedTasks);
   }
 
-  @Test
-  void givenTasksWithCircularDependency_whenSortingToBashScript_thenReturnBadRequest()
-      throws Exception {
-    final TasksRequest tasksRequest = givenTasksRequestWithCircularDependency();
-
-    final List<Task> unsortedTasks = givenUnsortedTasksWithCircularDependency();
-    when(service.sortTasks(unsortedTasks)).thenThrow(new CircularDependencyDetectedException());
-
-    mvc.perform(post("/tasks/sort-commands")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(tasksRequest)))
-        .andExpect(status().isBadRequest());
-
-    verify(service, times(1)).sortTasks(unsortedTasks);
-  }
-
-  @Test
-  void givenTasksWithInvalidPrerequisites_whenSorting_thenReturnBadRequest()
+  @ParameterizedTest
+  @ValueSource(strings = {"/tasks/sort", "/tasks/sort-commands"})
+  void givenTasksWithInvalidPrerequisites_whenSorting_thenReturnBadRequest(final String route)
       throws Exception {
     final TasksRequest tasksRequest = givenTasksRequestWithInvalidPrerequisites();
 
-    mvc.perform(post("/tasks/sort")
-            .contentType("application/json")
-            .content(objectMapper.writeValueAsString(tasksRequest)))
-        .andExpect(status().isBadRequest());
-
-    verifyNoInteractions(service);
-  }
-
-  @Test
-  void givenTasksWithInvalidPrerequisites_whenSortingToBashScript_thenReturnBadRequest()
-      throws Exception {
-    final TasksRequest tasksRequest = givenTasksRequestWithInvalidPrerequisites();
-
-    mvc.perform(post("/tasks/sort-commands")
+    mvc.perform(post(route)
             .contentType("application/json")
             .content(objectMapper.writeValueAsString(tasksRequest)))
         .andExpect(status().isBadRequest());
